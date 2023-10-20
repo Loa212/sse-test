@@ -8,16 +8,16 @@ const EventListener: React.FC = () => {
   useEffect(() => {
     const eventSource = new EventSource("http://localhost:8080/events"); // Set the correct SSE endpoint URL
 
-    eventSource.onmessage = (event) => {
+    eventSource.onmessage = (event: MessageEvent<string>) => {
       try {
-        const data = JSON.parse(event.data);
-        setEvents((prevEvents) => [...prevEvents, data.message]);
+        const data = JSON.parse(event.data) as EventData;
+        setEvents((prevEvents: string[]) => [...prevEvents, data.message]);
       } catch (error) {
         console.error("Failed to parse incoming event data:", error);
       }
     };
 
-    eventSource.onerror = (error) => {
+    eventSource.onerror = (error: Event) => {
       console.error("SSE error:", error);
     };
 
@@ -39,3 +39,7 @@ const EventListener: React.FC = () => {
 };
 
 export default EventListener;
+
+interface EventData {
+  message: string;
+}
