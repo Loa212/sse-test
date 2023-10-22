@@ -20,11 +20,16 @@
     "@trpc/next": "^10.37.1",
     "@trpc/react-query": "^10.37.1",
     "@trpc/server": "^10.37.1",
+    "@web3modal/wagmi": "^3.1.0",
     "next": "^13.5.4",
     "next-auth": "^4.23.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "superjson": "^1.13.1",
+    "viem": "^1.16.6",
+    "wagmi": "^1.4.5",
+    "web3": "^4.2.0",
+    "xdcpay-connect": "^1.0.3",
     "zod": "^3.22.4"
   },
   "devDependencies": {
