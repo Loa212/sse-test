@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/await-thenable */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { createContext, useCallback, useEffect, useState } from "react";
 import Web3Modal from "web3modal";
 import Web3 from "web3";
@@ -15,15 +19,23 @@ interface IWeb3ModalContext {
 
 export const Web3ModalContext = createContext<IWeb3ModalContext>({
   web3: null,
-  connect: () => {},
-  disconnect: () => {},
+  connect: () => {
+    throw new Error("connect function should not be called before initialized");
+  },
+  disconnect: () => {
+    throw new Error(
+      "disconnect function should not be called before initialized",
+    );
+  },
   account: null,
   chainId: null,
   networkId: null,
   connected: false,
 });
 
-const Web3ModalProvider = ({ children }) => {
+const Web3ModalProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   const [web3Modal, setWeb3Modal] = useState<Web3Modal | null>(null);
   const [web3, setWeb3] = useState<Web3 | null>(null);
   const [account, setAccount] = useState<string | null>(null);
@@ -41,8 +53,8 @@ const Web3ModalProvider = ({ children }) => {
     setWeb3Modal(_web3Modal);
   }, []);
 
-  const createWeb3 = (provider) => {
-    var realProvider;
+  const createWeb3 = (provider: unknown) => {
+    let realProvider;
 
     if (typeof provider === "string") {
       if (provider.includes("wss")) {
@@ -54,6 +66,7 @@ const Web3ModalProvider = ({ children }) => {
       realProvider = provider;
     }
 
+    // @ts-expect-error Web3 constructor type is wrong
     return new Web3(realProvider);
   };
 
@@ -66,15 +79,20 @@ const Web3ModalProvider = ({ children }) => {
   }, []);
 
   const subscribeProvider = useCallback(
-    async (_provider: any, _web3: Web3) => {
+    (_provider: unknown, _web3: Web3) => {
+      // @ts-expect-error Web3 provider type is wrong
       if (!_provider.on) return;
 
+      // @ts-expect-error Web3 provider type is wrong
       _provider.on("close", () => {
         resetWeb3();
       });
-      _provider.on("accountsChanged", async (accounts: string[]) => {
+      // @ts-expect-error Web3 provider type is wrong
+      _provider.on("accountsChanged", (accounts: string[]) => {
+        // @ts-expect-error toChecksumAddress is not in Web3 types
         setAccount(_web3.utils.toChecksumAddress(accounts[0]));
       });
+      // @ts-expect-error Web3 provider type is wrong
       _provider.on("chainChanged", async (chainId: number) => {
         console.log("Chain changed: ", chainId);
         const networkId = await _web3.eth.net.getId();
@@ -82,6 +100,7 @@ const Web3ModalProvider = ({ children }) => {
         setNetworkId(Number(networkId));
       });
 
+      // @ts-expect-error Web3 provider type is wrong
       _provider.on("networkChanged", async (networkId: number) => {
         const chainId = await _web3.eth.getChainId();
         setChainId(Number(chainId));
@@ -103,6 +122,7 @@ const Web3ModalProvider = ({ children }) => {
     await subscribeProvider(_provider, _web3);
 
     const accounts = await _web3.eth.getAccounts();
+    // @ts-expect-error Web3Modal provider type is wrong
     const _account = _web3.utils.toChecksumAddress(accounts[0]);
     const _networkId = await _web3.eth.net.getId();
     const _chainId = await _web3.eth.getChainId();
@@ -114,18 +134,19 @@ const Web3ModalProvider = ({ children }) => {
   }, [web3Modal, subscribeProvider]);
 
   useEffect(() => {
-    if (web3Modal && web3Modal.cachedProvider) {
-      connect();
+    if (web3Modal?.cachedProvider) {
+      void connect();
     }
   }, [web3Modal, connect]);
 
   const disconnect = useCallback(async () => {
-    if (web3 && web3.currentProvider) {
-      const _provider: any = web3.currentProvider;
+    if (web3?.currentProvider) {
+      const _provider: unknown = web3.currentProvider;
+      // @ts-expect-error Web3 provider type is wrong
       if (_provider.close) await _provider.close();
     }
     if (web3Modal) {
-      await web3Modal.clearCachedProvider();
+      web3Modal.clearCachedProvider();
     }
     resetWeb3();
   }, [web3Modal, web3, resetWeb3]);
