@@ -19,9 +19,19 @@ const WalletConnectButton: React.FC = () => {
   return (
     <span>
       {!account ? (
-        <div onClick={handleConnectWallet}>NOT CONNECTED</div>
+        <button
+          className="rounded bg-[#2e026d] px-4 py-2 font-bold text-white hover:bg-[#15162c]"
+          onClick={handleConnectWallet}
+        >
+          NOT CONNECTED
+        </button>
       ) : (
-        <div onClick={handleDisconnectWallet}>{ellipseAddress(account)}</div>
+        <button
+          className="rounded bg-[#2e026d] px-4 py-2 font-bold text-white hover:bg-[#15162c]"
+          onClick={handleDisconnectWallet}
+        >
+          {ellipseAddress(account)}
+        </button>
       )}
     </span>
   );
