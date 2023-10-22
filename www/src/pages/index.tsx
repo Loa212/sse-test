@@ -1,5 +1,6 @@
 // import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
+import Balance from "~/components/Balance";
 import EventListener from "~/components/event-listener";
 import WalletConnectButton from "~/components/wallet-connect-btn";
 
@@ -16,7 +17,8 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
-        <nav className="flex w-full items-center justify-end p-3 text-white ring">
+        <nav className="flex w-full items-center justify-between p-3 text-white ring">
+          <Balance />
           <WalletConnectButton />
         </nav>
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
